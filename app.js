@@ -90,24 +90,42 @@ class QuizEngine {
   /** @param {number} optionIndex */
   select(optionIndex) {
     // TODO: сохранить выбор пользователя для текущего вопроса
-    
+    this.answers[this.currentQuestion.id] = optionIndex;
     // throw new Error("Not implemented: QuizEngine.select");
   }
 
   getSelectedIndex() {
     // TODO: вернуть выбранный индекс для текущего вопроса (или undefined)
-    throw new Error("Not implemented: QuizEngine.getSelectedIndex");
+    return this.answers[this.currentQuestion.id];
+    // throw new Error("Not implemented: QuizEngine.getSelectedIndex");
   }
 
   tick() {
     // TODO: декремент таймера; если 0 — завершить тест
-    throw new Error("Not implemented: QuizEngine.tick");
+    if (this.remainingSec > 0) {
+      this.remainingSec -= 1;
+    } else {
+      this.finish();
+    }
+
+    // throw new Error("Not implemented: QuizEngine.tick");
   }
 
   finish() {
     // TODO: зафиксировать завершение и вернуть сводку результата
-    // return { correct: number, total: number, percent: number, passed: boolean }
-    throw new Error("Not implemented: QuizEngine.finish");
+    this.isFinished = true;
+    const total = this.length;
+    let correct = 0;
+    this.questions.forEach(question => {
+      const selected = this.answers[question.id];
+      if (selected === question.correctIndex) {
+        correct++;
+      }
+    });
+    const percent = correct / total;
+    const passed = percent >= this.passThreshold;
+    return { correct, total, percent, passed };
+    // throw new Error("Not implemented: QuizEngine.finish");
   }
 
   /** Восстановление/выгрузка состояния для localStorage */
