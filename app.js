@@ -190,7 +190,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   bindEvents();
   renderAll();
 
-  startTimer();
+  if (!engine.isFinished) {
+    startTimer();
+  } else {
+    renderResult(engine.finish());
+  }
 });
 
 async function loadQuiz() {
