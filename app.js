@@ -131,13 +131,25 @@ class QuizEngine {
   /** Восстановление/выгрузка состояния для localStorage */
   toState() {
     // TODO: вернуть сериализуемый снимок состояния
-    throw new Error("Not implemented: QuizEngine.toState");
+    return {
+      currentIndex: this.currentIndex,
+      answers: this.answers,
+      remainingSec: this.remainingSec,
+      isFinished: this.isFinished,
+    }
+    // throw new Error("Not implemented: QuizEngine.toState");
   }
 
   /** @param {any} state */
   static fromState(quiz, state) {
     // TODO: создать двигатель на базе сохранённого состояния
-    throw new Error("Not implemented: QuizEngine.fromState");
+    const engine = new QuizEngine(quiz);
+    engine.currentIndex = state.currentIndex;
+    engine.answers = state.answers;
+    engine.remainingSec = state.remainingSec;
+    engine.isFinished = state.isFinished;
+    return engine;
+    // throw new Error("Not implemented: QuizEngine.fromState");
   }
 }
 
