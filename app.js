@@ -25,18 +25,20 @@ class Question {
 class StorageService {
   static saveState(state) {
     // TODO: сериализовать state и сохранить в localStorage
-    // Пример: localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(state));
-    throw new Error("Not implemented: StorageService.saveState");
+    localStorage.setItem(STORAGE_KEYS.STATE, JSON.stringify(state));
+    // throw new Error("Not implemented: StorageService.saveState");
   }
 
   static loadState() {
     // TODO: прочитать и распарсить состояние, вернуть объект или null
-    throw new Error("Not implemented: StorageService.loadState");
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.STATE) ?? null);
+    // throw new Error("Not implemented: StorageService.loadState");
   }
 
   static clear() {
     // TODO: очистить сохранённое состояние
-    throw new Error("Not implemented: StorageService.clear");
+    localStorage.removeItem(STORAGE_KEYS.STATE);
+    // throw new Error("Not implemented: StorageService.clear");
   }
 }
 
@@ -66,23 +68,30 @@ class QuizEngine {
   /** @param {number} index */
   goTo(index) {
     // TODO: валидировать границы и сменить текущий индекс
-    throw new Error("Not implemented: QuizEngine.goTo");
+    if (index < 0 || index >= this.length) {
+      throw new Error("Invalid question index");
+    }
+    this.currentIndex = index;
+    // throw new Error("Not implemented: QuizEngine.goTo");
   }
 
   next() {
     // TODO: перейти к следующему вопросу, если возможно
-    throw new Error("Not implemented: QuizEngine.next");
+    this.goTo(this.currentIndex + 1);
+    // throw new Error("Not implemented: QuizEngine.next");
   }
 
   prev() {
     // TODO: перейти к предыдущему вопросу, если возможно
-    throw new Error("Not implemented: QuizEngine.prev");
+    this.goTo(this.currentIndex - 1);
+    // throw new Error("Not implemented: QuizEngine.prev");
   }
 
   /** @param {number} optionIndex */
   select(optionIndex) {
     // TODO: сохранить выбор пользователя для текущего вопроса
-    throw new Error("Not implemented: QuizEngine.select");
+    
+    // throw new Error("Not implemented: QuizEngine.select");
   }
 
   getSelectedIndex() {
