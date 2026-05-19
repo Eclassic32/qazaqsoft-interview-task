@@ -45,17 +45,22 @@ class StorageService {
 // ========== Движок теста ==========
 class QuizEngine {
   /** @param {QuizDTO} quiz */
-  constructor(quiz) {
+  constructor(quiz, randomSeed) {
     this.title = quiz.title;
     this.timeLimitSec = quiz.timeLimitSec;
     this.passThreshold = quiz.passThreshold;
-    this.questions = quiz.questions.map((q) => new Question(q));
+    this.originalQuestions = quiz.questions.map((q) => new Question(q));
 
     this.currentIndex = 0;
     /** @type {Record<string, number|undefined>} */
     this.answers = {}; // questionId -> selectedIndex
     this.remainingSec = quiz.timeLimitSec;
     this.isFinished = false;
+
+    // randomize question/answer orders
+    this.randomSeed = randomSeed ?? Math.random(); 
+    this.randomizeQuestions();
+    this.randomizeQuestionAnswers();
   }
 
   get length() {
@@ -63,6 +68,29 @@ class QuizEngine {
   }
   get currentQuestion() {
     return this.questions[this.currentIndex];
+  }
+
+  // Randomize Questions
+  randomizeQuestions() {
+    const questions = [...this.originalQuestions];
+    for (let i = questions.length - 1; i > 0; i--) {
+      const j = Math.floor(this.randomSeed * (i + 1));
+      [questions[i], questions[j]] = [questions[j], questions[i]];
+    } 
+    this.questions = questions;
+  }
+
+  randomizeQuestionAnswers() {
+    this.questions.forEach((question) => {
+      const options = [...question.options];
+      const correctOption = options[question.correctIndex];
+      for (let i = options.length - 1; i > 0; i--) {
+        const j = Math.floor(this.randomSeed * (i + 1));
+        [options[i], options[j]] = [options[j], options[i]];
+      }
+      question.options = options;
+      question.correctIndex = options.indexOf(correctOption);
+    });
   }
 
   /** @param {number} index */
@@ -105,7 +133,10 @@ class QuizEngine {
     if (this.remainingSec > 0) {
       this.remainingSec -= 1;
     } else {
-      this.finish();
+      const fin = this.finish();
+      stopTimer();
+      renderResult(fin);
+      persist();
     }
 
     // throw new Error("Not implemented: QuizEngine.tick");
@@ -136,6 +167,7 @@ class QuizEngine {
       answers: this.answers,
       remainingSec: this.remainingSec,
       isFinished: this.isFinished,
+      randomSeed: this.randomSeed,
     }
     // throw new Error("Not implemented: QuizEngine.toState");
   }
@@ -143,7 +175,7 @@ class QuizEngine {
   /** @param {any} state */
   static fromState(quiz, state) {
     // TODO: создать двигатель на базе сохранённого состояния
-    const engine = new QuizEngine(quiz);
+    const engine = new QuizEngine(quiz, state.randomSeed);
     engine.currentIndex = state.currentIndex;
     engine.answers = state.answers;
     engine.remainingSec = state.remainingSec;
